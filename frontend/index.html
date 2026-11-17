@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WarehouseTwin</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <strong class="brand">WarehouseTwin</strong>
+      <nav class="steps" id="features" aria-label="Tính năng">
+        <button type="button" data-feature="rooms">Kho hàng (mặt bằng, 3D)</button>
+        <button type="button" data-feature="receive">Nhập lô hàng</button>
+      </nav>
+      <span id="api-status" class="api-status">Đang kết nối API…</span>
+    </header>
+
+    <div class="workspace" id="workspace">
+      <aside class="sidebar" id="sidebar"></aside>
+
+      <main class="stage">
+        <!-- Thanh của kho đang mở (tính năng Kho hàng): về danh sách, tên kho, chuyển Mặt bằng / Kho 3D. -->
+        <div class="room-header" id="room-bar" hidden>
+          <button type="button" id="back-to-rooms">← Danh sách kho</button>
+          <strong id="room-title"></strong>
+          <nav class="steps room-tabs" id="steps" aria-label="Xem kho">
+            <button type="button" data-step="layout">Mặt bằng</button>
+            <button type="button" data-step="warehouse">Kho 3D</button>
+            <button type="button" data-step="robot">Robot</button>
+          </nav>
+        </div>
+        <section class="view" id="view-layout">
+          <div class="room-list" id="room-list"></div>
+          <div class="room-editor" id="room-editor">
+            <div class="toolbar" id="toolbar-2d"></div>
+            <div class="canvas-wrap" id="editor2d"></div>
+          </div>
+        </section>
+        <section class="view" id="view-warehouse" hidden>
+          <div class="canvas-wrap" id="viewport3d"></div>
+          <aside class="receive-dock receive" id="stock-root" aria-label="Kho đang mở"></aside>
+        </section>
+        <section class="view" id="view-robot" hidden>
+          <div class="robot-view" id="robot-root"></div>
+        </section>
+        <section class="view" id="view-receive" hidden>
+          <div class="receive receive-page" id="receive-root"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer class="statusbar">
+      <span id="status-message"></span>
+      <span id="status-cursor"></span>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

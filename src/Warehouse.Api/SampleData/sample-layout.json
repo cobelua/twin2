@@ -1,0 +1,20 @@
+{
+  "room": { "name": "Kho mẫu", "width": 20, "depth": 12, "gridSize": 0.5, "minGap": 1.0, "margin": 0.05 },
+  "obstacles": [
+    { "kind": "Column", "x": 6.3,  "y": 7.5,  "width": 0.4, "depth": 0.4 },
+    { "kind": "Column", "x": 12.3, "y": 7.5,  "width": 0.4, "depth": 0.4 },
+    { "kind": "Column", "x": 6.3,  "y": 10.5, "width": 0.4, "depth": 0.4 },
+    { "kind": "Column", "x": 12.3, "y": 10.5, "width": 0.4, "depth": 0.4 },
+    { "kind": "Wall",   "x": 19.0, "y": 8.0,  "width": 0.2, "depth": 4.0 }
+  ],
+  "racks": [
+    { "code": "K1", "x": 1,  "y": 1,   "rotation": 0,  "levels": 2, "levelHeight": 1.5, "bays": 4, "bayWidth": 1.2, "depth": 1.0, "hasTop": true,  "maxWeight": 1000 },
+    { "code": "K2", "x": 7,  "y": 1,   "rotation": 0,  "levels": 3, "levelHeight": 1.2, "bays": 4, "bayWidth": 1.2, "depth": 1.0, "hasTop": true,  "maxWeight": 1000 },
+    { "code": "K3", "x": 13, "y": 1,   "rotation": 0,  "levels": 4, "levelHeight": 1.0, "bays": 4, "bayWidth": 1.2, "depth": 1.0, "hasTop": false, "maxWeight": 1000 },
+    { "code": "K4", "x": 1,  "y": 3,   "rotation": 0,  "levels": 2, "levelHeight": 1.8, "bays": 4, "bayWidth": 1.2, "depth": 1.0, "hasTop": true,  "maxWeight": 2000 },
+    { "code": "K5", "x": 7,  "y": 3,   "rotation": 0,  "levels": 3, "levelHeight": 1.2, "bays": 4, "bayWidth": 1.2, "depth": 1.0, "hasTop": false, "maxWeight": 1000 },
+    { "code": "K6", "x": 13, "y": 3,   "rotation": 0,  "levels": 3, "levelHeight": 1.5, "bays": 4, "bayWidth": 1.2, "depth": 1.0, "hasTop": true,  "maxWeight": 1000 },
+    { "code": "K7", "x": 1,  "y": 5,   "rotation": 0,  "levels": 2, "levelHeight": 1.2, "bays": 4, "bayWidth": 1.2, "depth": 1.0, "hasTop": true,  "maxWeight": 1000 },
+    { "code": "K8", "x": 15, "y": 6.5, "rotation": 90, "levels": 3, "levelHeight": 1.2, "bays": 3, "bayWidth": 1.2, "depth": 1.0, "hasTop": true,  "maxWeight": 1000 }
+  ]
+}

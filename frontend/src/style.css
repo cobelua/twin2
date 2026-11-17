@@ -1,0 +1,427 @@
+/* Màu dùng chung cho giao diện và canvas 2D (editor2d đọc các biến --c2d-* bằng getComputedStyle). */
+:root {
+  --bg: #f4f5f7;
+  --panel: #ffffff;
+  --border: #dde1e8;
+  --text: #1d2433;
+  --muted: #6b7385;
+  --accent: #2563eb;
+  --ok: #1f8a4c;
+  --error: #c0392b;
+
+  --c2d-outside: #e9ecf1;
+  --c2d-floor: #ffffff;
+  --c2d-grid: #e3e7ee;
+  --c2d-grid-major: #c9d0db;
+  --c2d-room-edge: #1d2433;
+  --c2d-wall: #3b4252;
+  --c2d-column: #8b93a5;
+  --c2d-rack: #dbe7ff;
+  --c2d-rack-edge: #2563eb;
+  --c2d-rack-bay: #9db8f0;
+  --c2d-rack-selected: #f59e0b;
+  --c2d-label: #1d2433;
+  --c2d-ghost-ok: rgba(31, 138, 76, 0.22);
+  --c2d-ghost-ok-edge: #1f8a4c;
+  --c2d-ghost-bad: rgba(192, 57, 43, 0.22);
+  --c2d-ghost-bad-edge: #c0392b;
+  --c2d-ghost-pending: rgba(107, 115, 133, 0.2);
+  --c2d-ghost-pending-edge: #6b7385;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  display: flex;
+  flex-direction: column;
+  font: 14px/1.4 system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+[hidden] { display: none !important; }
+
+/* ---- thanh trên + thanh bước ---- */
+.topbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.brand { white-space: nowrap; }
+.steps { display: flex; gap: 4px; }
+.steps button {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+}
+.steps button[aria-current='step'] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.api-status { margin-left: auto; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.api-status.ok { color: var(--ok); }
+.api-status.error { color: var(--error); }
+
+/* ---- vùng làm việc ---- */
+.workspace { flex: 1; min-height: 0; display: flex; }
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 12px 16px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+}
+.sidebar h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 16px 0 6px; }
+.sidebar h2:first-child { margin-top: 0; }
+.sidebar dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; }
+.sidebar dt { color: var(--muted); }
+.sidebar dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.sidebar .hint { color: var(--muted); font-size: 13px; }
+.rack-list { list-style: none; margin: 0; padding: 0; }
+.rack-list button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  border: 0;
+  background: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.rack-list button:hover { background: var(--bg); }
+.rack-list button[aria-pressed='true'] { background: #fef3c7; }
+.rack-list .muted { color: var(--muted); }
+
+.stage { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.view { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.room-header[hidden] { display: none; }
+.room-tabs { margin-left: auto; }
+.placeholder { align-items: center; justify-content: center; color: var(--muted); }
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.toolbar button, .toolbar label {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.toolbar .zoom { min-width: 56px; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; }
+.canvas-wrap { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.canvas-wrap canvas { position: absolute; inset: 0; display: block; }
+
+/* ---- thanh trạng thái ---- */
+.statusbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  min-height: 26px;
+}
+#status-message.error { color: var(--error); }
+#status-cursor { font-variant-numeric: tabular-nums; }
+
+/* ---- công cụ trên thanh editor ---- */
+.tool-group { display: inline-flex; }
+.tool-group button { border-radius: 0; margin-left: -1px; }
+.tool-group button:first-child { border-radius: 6px 0 0 6px; margin-left: 0; }
+.tool-group button:last-child { border-radius: 0 6px 6px 0; }
+.toolbar button[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: #fff; position: relative; }
+.toolbar-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
+.toolbar-hint { margin-left: auto; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.canvas-wrap canvas:focus { outline: none; }
+.canvas-wrap canvas.placing { cursor: crosshair; }
+
+/* ---- bảng bên: các phần, form ---- */
+.section, .section-plain { border-bottom: 1px solid var(--border); padding: 8px 0 10px; }
+.section > summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--muted);
+  padding: 2px 0 6px;
+}
+.section-plain h2 { margin-top: 0; }
+.grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; margin: 4px 0; }
+.grid-form label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+.grid-form label.check { flex-direction: row; align-items: center; gap: 6px; color: var(--text); font-size: 13px; }
+.grid-form .full { grid-column: 1 / -1; }
+.grid-form input, .grid-form select {
+  font: inherit;
+  font-size: 13px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  background: var(--panel);
+  min-width: 0;
+}
+.grid-form input:disabled { color: var(--muted); background: var(--bg); }
+.form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 6px; margin-top: 2px; }
+.sidebar button[type='submit'], .sidebar .form-actions button {
+  font: inherit;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  cursor: pointer;
+}
+.sidebar button[type='submit'] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.sidebar button.danger { color: var(--error); }
+.live { margin: 0; font-size: 12px; color: var(--muted); min-height: 1.4em; }
+.live.ok { color: var(--ok); }
+.live.error { color: var(--error); }
+.rack-list li.row { display: flex; gap: 4px; }
+.rack-list li.row > button:first-child { flex: 1; }
+.rack-list button.icon { width: auto; padding: 4px 8px; }
+
+/* ---- sửa tràn ở màn hình hẹp ---- */
+.sidebar { overflow-x: hidden; }
+.grid-form > * { min-width: 0; }
+.grid-form input, .grid-form select { width: 100%; }
+.toolbar { overflow: hidden; }
+.toolbar button, .toolbar label { white-space: nowrap; flex-shrink: 0; }
+.toolbar-hint { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- nhiều phòng: danh sách phòng, form thêm phòng, thanh tên phòng ---- */
+.workspace.no-sidebar .sidebar { display: none; }
+.room-list { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.room-list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.room-list-head h1 { font-size: 18px; margin: 0; }
+.room-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.room-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.room-card:hover { border-color: var(--accent); }
+.room-card strong { font-size: 15px; }
+.room-card .muted { color: var(--muted); font-size: 13px; }
+.room-form {
+  max-width: 520px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.room-form h2 { font-size: 15px; margin: 0 0 8px; }
+.grid-form.wide { grid-template-columns: repeat(3, 1fr); }
+button.primary {
+  font: inherit;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+button.primary:disabled { opacity: 0.45; cursor: not-allowed; }   /* bị khoá thì nhìn ra ngay là không bấm được */
+.room-form .form-actions button:not(.primary) {
+  font: inherit;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  cursor: pointer;
+}
+.room-editor { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.room-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.room-header button {
+  font: inherit;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.form-actions .push-left { margin-right: auto; }
+
+/* Thanh bản nháp ở đầu bảng bên: trạng thái chưa lưu + nút Lưu nháp / Bỏ thay đổi */
+.draft-bar { display: flex; align-items: center; gap: 6px; padding: 8px 0; position: sticky; top: 0; z-index: 1; background: var(--bg, inherit); }
+.draft-status { flex: 1; min-width: 0; font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.draft-status.dirty { color: var(--warn, #b45309); }
+.draft-status.error { color: var(--error); }
+.draft-bar button:disabled { opacity: 0.5; cursor: default; }
+
+/* Cảnh 3D: bảng thông tin nổi góc trái */
+#viewport3d { position: relative; }
+.view3d-overlay {
+  position: absolute; top: 10px; left: 10px; max-width: 260px; padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.92); border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13px; pointer-events: none;
+}
+.view3d-overlay p { margin: 4px 0; }
+.view3d-overlay .hint { color: var(--muted); }
+.view3d-overlay .warn { color: var(--error); }
+.view3d-overlay .legend { display: flex; flex-wrap: wrap; gap: 8px; }
+.view3d-overlay .legend-item { display: inline-flex; align-items: center; gap: 4px; }
+.view3d-overlay .legend-item i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+
+/* Hộp hỏi lại trong trang (thay window.confirm) */
+.confirm-dialog { border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; max-width: 360px; color: var(--text); }
+.confirm-dialog::backdrop { background: rgba(29, 36, 51, 0.35); }
+.confirm-dialog p { margin: 0 0 14px; line-height: 1.4; }
+.confirm-dialog .form-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Nút tốc độ pallet bay (cảnh 3D) */
+.view3d-speed {
+  position: absolute; left: 10px; bottom: 10px; display: flex; align-items: center; gap: 6px;
+  padding: 6px 8px; background: rgba(255, 255, 255, 0.92); border: 1px solid var(--border); border-radius: 6px; font-size: 13px;
+}
+.view3d-speed button { padding: 2px 8px; }
+.view3d-speed button[aria-pressed='true'] { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Màn Nhập hàng */
+.receive { padding: 16px 20px; overflow: auto; height: 100%; box-sizing: border-box; max-width: 980px; }
+.receive h2 { margin: 0 0 4px; font-size: 18px; }
+.receive h3 { margin: 18px 0 8px; font-size: 15px; }
+.receive .hint { color: var(--muted); margin: 0 0 12px; font-size: 13px; }
+.receive table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.receive th, .receive td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+.receive table.lines input { width: 84px; }
+.receive table.lines select { max-width: 150px; }
+.receive-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.receive .chip { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; }
+.receive .ok { color: var(--ok); }
+.receive .warn { color: var(--error); }
+.receive tr.status-Partial td, .receive tr.status-Full td, .receive tr.status-NoRack td { color: var(--error); }
+.receive .muted { color: var(--muted); }
+.receive-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.receive .inline-form { display: flex; align-items: center; gap: 6px; }
+.receive .inline-form input { width: 130px; }
+
+/* Bảng Nhập hàng gắn trong màn 3D */
+#view-warehouse { position: relative; }
+.receive-dock {
+  position: absolute; top: 10px; right: 10px; width: min(560px, 58%); max-height: calc(100% - 20px);
+  overflow: auto; box-sizing: border-box; padding: 0; max-width: none; height: auto;
+  background: rgba(255, 255, 255, 0.97); border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(29, 36, 51, 0.15);
+}
+.receive-dock .dock-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: inherit; z-index: 1; }
+.receive-dock .dock-body { padding: 10px 12px 14px; }
+.receive-dock .dock-body[hidden] { display: none; }
+.receive-dock table.lines input { width: 62px; }
+.receive-dock table.lines select { max-width: 110px; }
+.receive-dock .receive-footer { margin-top: 14px; }
+.receive-dock .inline-form input { width: 100px; }
+
+.receive-dock table.lines input { width: 50px; padding: 3px 4px; }
+.receive-dock table.lines select { max-width: 96px; }
+.receive-dock th, .receive-dock td { padding: 4px 3px; }
+.receive-dock { width: min(320px, 45%); }   /* màn 3D chỉ còn bảng xem kho: hẹp lại cho rộng cảnh */
+
+/* Màn Nhập lô hàng riêng (#/receive) */
+.receive-page { margin: 0 auto; }
+.receive-page-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.receive-page-head h1 { font-size: 18px; margin: 0; }
+.room-list-actions { display: flex; gap: 8px; }
+.view3d-speed { z-index: 2; }
+
+/* Màn Robot quét: thanh điều khiển, dòng số liệu, canvas (ô "Robot thấy" ở góc phải trên), kết quả dưới cùng. */
+.robot-view { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; padding: 8px 12px; }
+.robot-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.robot-toolbar label { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); }
+.robot-speed { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); }
+.robot-speed button { padding: 2px 8px; }
+.robot-speed button[aria-pressed='true'] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.robot-stats { color: var(--muted); font-variant-numeric: tabular-nums; }
+.robot-canvas { border: 1px solid var(--border); border-radius: 6px; }
+.robot-inset { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.robot-inset span { font-size: 12px; color: var(--muted); background: rgba(255, 255, 255, 0.85); padding: 0 4px; border-radius: 3px; }
+.robot-inset canvas { position: static; border-radius: 6px; }
+.robot-result p { margin: 0 0 6px; }
+.robot-result .hint { color: var(--muted); }
+
+/* Nhật ký robot chở hàng trong cảnh 3D (góc dưới phải). */
+.view3d-robot-log {
+  position: absolute; right: 12px; bottom: 12px; z-index: 2; max-width: min(460px, 60%);
+  background: rgba(255, 255, 255, 0.92); border: 1px solid var(--border); border-radius: 6px;
+  padding: 6px 10px; font-size: 13px; pointer-events: none;
+}
+.view3d-robot-log[hidden] { display: none; }
+.view3d-robot-log p { margin: 3px 0; }
+.view3d-robot-log p + p { color: var(--muted); }
+
+/* Bảng Robot trong cảnh 3D (góc dưới trái, trên thanh tốc độ). */
+.view3d-robot-panel {
+  position: absolute; left: 12px; bottom: 56px; z-index: 3; max-width: min(380px, 70%);
+  background: rgba(255, 255, 255, 0.95); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 13px;
+}
+.view3d-robot-panel .robot-panel-toggle { font-weight: 600; }
+.robot-panel-body { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.robot-panel-body[hidden] { display: none; }
+.robot-panel-body label { display: flex; align-items: center; gap: 6px; }
+.robot-panel-body input[type='range'] { flex: 1; min-width: 80px; }
+.robot-panel-body .hint { margin: 0; color: var(--muted); }
+.robot-panel-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.robot-panel-row button[aria-pressed='true'] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.robot-panel-row button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.robot-panel-msg { margin: 0; min-height: 1em; color: var(--accent); }
+.robot-panel-list { margin: 0; padding-left: 16px; }
+.robot-panel-list li { margin: 2px 0; }
+.robot-panel-list .ok { color: var(--ok); }
+.robot-panel-list .warn { color: var(--error); }
+.robot-panel-list button { padding: 0 6px; margin-left: 4px; }
+.placing-obstacle canvas { cursor: crosshair; }
+
+/* Tab Robot: nút chọn chế độ + hai khung (Kiểm chứng thiết kế / Số hoá kho cũ). */
+.robot-modes { display: flex; gap: 4px; }
+.robot-modes button[aria-pressed='true'] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.robot-pane { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.robot-pane[hidden] { display: none; }
+.robot-toolbar .hint { color: var(--muted); }
+.robot-result .ok { color: var(--ok); }
+.robot-result .warn { color: var(--error); }
+.robot-result ul { margin: 0; padding-left: 18px; }
+
+/* Số hoá kho cũ: cảnh 3D bên trái, bản đồ robot bên phải. */
+.robot-split { flex: 1; min-height: 260px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.robot-file { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.robot-file input { max-width: 200px; }
+.robot-sep { width: 1px; height: 20px; background: var(--border); }
+.robot-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 6px; }
+.robot-table th, .robot-table td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+.robot-table th { color: var(--muted); font-weight: 500; }
+.robot-table .ok { color: var(--ok); }
+.robot-table .warn { color: var(--error); }
